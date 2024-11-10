@@ -1,0 +1,89 @@
+<div class="container my-4">
+  <div class="row">
+
+    <div class="col-md-5">
+      <div class="card">
+        <div class="card-header bg-danger text-white">
+          <h4>{{ isEditing ? 'Edit Expense' : 'Add Expense' }}</h4>
+        </div>
+        <div class="card-body">
+
+          <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" id="title" class="form-control" [(ngModel)]="expense.title" name="title" required />
+          </div>
+
+          <div class="mb-3">
+            <label for="date" class="form-label">Date</label>
+            <input type="date" id="date" class="form-control" [(ngModel)]="expense.date" name="date" required />
+          </div>
+
+          <div class="mb-3">
+            <label for="amount" class="form-label">Amount (Rs)</label>
+            <input type="number" id="amount" class="form-control" [(ngModel)]="expense.amount" name="amount" required />
+          </div>
+
+          <div class="mb-3">
+            <label for="category" class="form-label">Category</label>
+            <select id="category" class="form-select" [(ngModel)]="expense.category" name="category" required>
+              <option value="">Select Category</option>
+              <option value="Salary">Salary</option>
+              <option value="Freelance">Freelance</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea id="description" class="form-control" [(ngModel)]="expense.description"
+              name="description"></textarea>
+          </div>
+
+          <button type="submit" [disabled]="!expense.date || !expense.amount || !expense.title || !expense.category"
+            class="btn btn-danger w-100" (click)="addExpense()">
+            {{ isEditing ? 'Update Expense' : 'Add Expense' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-7">
+      <div class="card">
+        <div class="card-header bg-secondary text-white">
+          <h4>Expense History</h4>
+        </div>
+        <div class="card-body">
+          <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+              <tr>
+                <th>Date</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let expense of expenseList">
+                <td>{{ expense.date }}</td>
+                <td>{{ expense.title }}</td>
+                <td>{{ expense.category }}</td>
+                <td>{{ expense.description }}</td>
+                <td>Rs{{ expense.amount.toFixed(2) }}</td>
+                <td>
+                  <button class="btn btn-sm btn-info me-2" (click)="editExpenseById(expense.id)">
+                    Edit
+                  </button>
+                  <button class="btn btn-sm btn-danger" (click)="deleteExpenseById(expense.id)">
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

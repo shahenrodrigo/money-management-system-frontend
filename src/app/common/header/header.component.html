@@ -1,0 +1,16 @@
+<div class="container">
+    <header
+        class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+        <div class="col-md-3 mb-2 mb-md-0">
+
+        </div>
+
+        <ul class="nav nav-pills">
+            <li (click)="changeSelectorHeader('DashBoard')" routerLink="" class="nav-item "><a class="nav-link" aria-current="page" [ngClass]="{'active':headerSelector=='DashBoard'}">DashBoard</a></li>
+            <li (click)="changeSelectorHeader('Income')" routerLink="/income" class="nav-item"><a class="nav-link" [ngClass]="{'active':headerSelector=='Income'}">Income</a></li>
+            <li (click)="changeSelectorHeader('Expense')" routerLink="/expense" class="nav-item"><a class="nav-link" [ngClass]="{'active':headerSelector=='Expense'}">Expense</a></li>
+            
+        </ul>
+
+    </header>
+</div>

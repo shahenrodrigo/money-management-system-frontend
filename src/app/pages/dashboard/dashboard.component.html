@@ -1,0 +1,74 @@
+<div class="container my-4">
+
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5>Total Balance</h5>
+          <h2 style="color: #28a745;">Rs {{ totalBalance.toFixed(2) }}</h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5>Total Income</h5>
+          <h2 style="color: #28a745;">Rs {{ totalIncome.toFixed(2) }}</h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5>Total Expenses</h5>
+          <h2 style="color: #dc3545;">Rs {{ totalExpenses.toFixed(2) }}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header text-center" style="background-color: #007bff; color: white;">
+          Income Statistics
+        </div>
+        <div class="card-body">
+          <p>Highest Income: <span style="color: #28a745;">Rs. {{ highestIncome.amount }} - {{ highestIncome.date }}</span>
+          </p>
+          <p>Lowest Income: <span style="color: #28a745;">Rs. {{ lowestIncome.amount }} - {{ lowestIncome.date }}</span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header text-center" style="background-color: #dc3545; color: white;">
+          Expense Statistics
+        </div>
+        <div class="card-body">
+          <p>Highest Expense: <span style="color: #dc3545;">Rs. {{ highestExpense.amount }} - {{ highestExpense.date
+              }}</span></p>
+          <p>Lowest Expense: <span style="color: #dc3545;">Rs. {{ lowestExpense.amount }} - {{ lowestExpense.date }}</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header text-center">
+          Total Balance Over Time
+        </div>
+        <div class="card-body">
+          <canvas baseChart [data]="lineChartData" [options]="lineChartOptions" [type]="lineChartType"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
