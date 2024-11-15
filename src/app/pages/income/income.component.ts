@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgFor } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { AuthServiceService } from '../../auth-service.service';
 
 @Component({
   selector: 'app-income',
@@ -12,6 +13,9 @@ import { HttpClient } from '@angular/common/http';
 })
 export class IncomeComponent implements OnInit {
 
+
+  //public userid: any = 1;
+
   public incomeList: any = [];
 
   public income: any = {
@@ -20,15 +24,22 @@ export class IncomeComponent implements OnInit {
     category: "",
     description: "",
     amount: "",
-    date: ""
+    date: "",
+    userId:''
   };
+
+  loginUserdata: any;
 
   public isEditing: boolean = false; // To toggle between Add and Edit modes
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private authService: AuthServiceService) { }
 
   ngOnInit(): void {
-    this.loadData();
+    this.authService.user$.subscribe(userData => {
+      this.loginUserdata = userData;
+      this.income.userId=this.loginUserdata.id;
+      this.loadData();
+    });
   }
 
 
@@ -55,7 +66,7 @@ export class IncomeComponent implements OnInit {
   }
 
   public loadData() {
-    this.http.get("http://localhost:8080/api/incomes/all").subscribe((data) => {
+    this.http.get(`http://localhost:8080/api/incomes/get-all/${this.loginUserdata.id}`).subscribe((data) => {
       this.incomeList = data;
       console.log("Income list loaded:", data);
     }, (error) => {

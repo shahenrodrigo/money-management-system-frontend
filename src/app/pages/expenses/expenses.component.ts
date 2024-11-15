@@ -1,20 +1,20 @@
 import { Component, OnInit } from '@angular/core';
-import { FormsModule} from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { NgFor } from '@angular/common';
-import { HttpClient} from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
+import { AuthServiceService } from '../../auth-service.service';
 
 
 @Component({
   selector: 'app-expense',
   standalone: true,
-  imports: [FormsModule,NgFor],
+  imports: [FormsModule, NgFor],
   templateUrl: './expenses.component.html',
   styleUrls: ['./expenses.component.css']
 })
 export class ExpensesComponent implements OnInit {
 
-
-  public expenseList:any =[];
+  public expenseList: any = [];
 
   public expense: any = {
 
@@ -24,20 +24,26 @@ export class ExpensesComponent implements OnInit {
     description: '',
     amount: '',
     date: '',
-
+    userId:''
   };
 
+  loginUserdata: any;
   public isEditing: boolean = false;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private authService: AuthServiceService) { }
 
-  ngOnInit(){
-    this.loadData();
+  ngOnInit(): void {
+    this.authService.user$.subscribe(userData => {
+      this.loginUserdata = userData;
+      this.expense.userId=this.loginUserdata.id;
+      this.loadData();
+    });
   }
 
+  
   public addExpense() {
     if (this.isEditing) {
-      
+
       this.http
         .put(
           `http://localhost:8080/api/expenses/${this.expense.id}`,
@@ -54,7 +60,7 @@ export class ExpensesComponent implements OnInit {
           }
         );
     } else {
-      
+
       this.http.post('http://localhost:8080/api/expenses', this.expense).subscribe(
         (data) => {
           alert('Expense added successfully');
@@ -68,20 +74,18 @@ export class ExpensesComponent implements OnInit {
     }
   }
 
-  public loadData() {
 
-    this.http.get("http://localhost:8080/api/expenses/all").subscribe((data) => {
-    
+
+  public loadData() {
+    this.http.get(`http://localhost:8080/api/expenses/get-all/${this.loginUserdata.id}`).subscribe((data) => {
       this.expenseList = data;
-      console.log('Expense list loaded', data);
-    },
-    (error) => {
-      console.error('Error loading expense list', error);
-    })
-    
+      console.log("Income list loaded:", data);
+    }, (error) => {
+      console.error('Error loading income list:', error);
+    });
   }
 
-  
+
 
   public editExpenseById(id: any) {
     this.http.get(`http://localhost:8080/api/expenses/${id}`).subscribe(

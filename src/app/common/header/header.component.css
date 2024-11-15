@@ -1,0 +1,29 @@
+/* Header Component Styles */
+header {
+    background-color: #1f1f2e;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 10px 20px;
+  }
+  
+  header .nav-pills {
+    gap: 10px;
+  }
+  
+  header .nav-pills .nav-link {
+    font-size: 1rem;
+    color: #d1d1e0;
+    padding: 8px 16px;
+    border-radius: 20px;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  header .nav-pills .nav-link.active {
+    background-color: #00bcd4;
+    color: #fff;
+  }
+  
+  header .nav-pills .nav-link:hover {
+    background-color: #005f73;
+    color: #ffffff;
+  }
+  

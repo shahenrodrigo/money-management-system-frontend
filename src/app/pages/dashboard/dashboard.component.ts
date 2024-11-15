@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ChartConfiguration, ChartType } from 'chart.js';
+import { ChartConfiguration, ChartTypeRegistry } from 'chart.js';
 import { NgChartsModule } from 'ng2-charts';
+import { AuthServiceService } from '../../auth-service.service'; // Import Auth Service for user data
+import { NgStyle } from '@angular/common';
 
 interface ChartData {
   dates: string[];
@@ -31,11 +33,13 @@ interface StatData {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [NgChartsModule],
+  imports: [NgChartsModule,NgStyle],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements OnInit {
+  lineChartType: keyof ChartTypeRegistry = 'line';
+
   totalBalance: number = 0;
   totalIncome: number = 0;
   totalExpenses: number = 0;
@@ -46,20 +50,35 @@ export class DashboardComponent implements OnInit {
   highestExpense = { amount: 0, date: '' };
   lowestExpense = { amount: Infinity, date: '' };
 
-  public lineChartData: ChartConfiguration<'line'>['data'] = {
-    labels: [], // X-axis: Dates
+  loginUserdata: any; // Store logged-in user data
+
+  public expenseChartData: ChartConfiguration<'line'>['data'] = {
+    labels: [],
     datasets: [
       {
-        data: [], // Y-axis: Balances
-        label: 'Total Balance',
+        data: [],
+        label: 'Expenses',
+        borderColor: 'red',
+        backgroundColor: 'rgba(255, 0, 0, 0.3)',
         fill: true,
-        borderColor: 'blue',
-        backgroundColor: 'rgba(0, 123, 255, 0.3)',
       },
     ],
   };
 
-  public lineChartOptions: ChartConfiguration<'line'>['options'] = {
+  public incomeChartData: ChartConfiguration<'line'>['data'] = {
+    labels: [],
+    datasets: [
+      {
+        data: [],
+        label: 'Income',
+        borderColor: 'green',
+        backgroundColor: 'rgba(0, 255, 0, 0.3)',
+        fill: true,
+      },
+    ],
+  };
+
+  public chartOptions: ChartConfiguration<'line'>['options'] = {
     responsive: true,
     plugins: {
       legend: {
@@ -73,23 +92,41 @@ export class DashboardComponent implements OnInit {
     },
   };
 
-  public lineChartType: ChartType = 'line';
-
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthServiceService) {}
 
   ngOnInit(): void {
-    this.loadChartData();
-    this.loadStatsData();
+    // Fetch user data from AuthService
+    this.authService.user$.subscribe((userData) => {
+      this.loginUserdata = userData;
+      this.loadChartData();
+      this.loadStatsData();
+    });
   }
 
   // Load chart data for the graph
-  private loadChartData(): void {
-    this.http.get<ChartData>('http://localhost:8080/api/stats/chart').subscribe(
+  private loadChartData(){
+    this.http.get<any>(`http://localhost:8080/api/stats/chart/${this.loginUserdata.id}`).subscribe(
       (chartData) => {
-        this.lineChartData.labels = chartData.dates;
-        this.lineChartData.datasets[0].data = chartData.balances;
+        const expenseData = chartData.expenseEntityList.map((expense: any) => ({
+          date: expense.date,
+          amount: expense.amount,
+        }));
 
-        console.log('Chart Data:', chartData);
+        const incomeData = chartData.incomeEntityList.map((income: any) => ({
+          date: income.date,
+          amount: income.amount,
+        }));
+
+        // For Expense Chart
+        this.expenseChartData.labels = expenseData.map((e: any) => e.date);
+        this.expenseChartData.datasets[0].data = expenseData.map((e: any) => e.amount);
+
+        // For Income Chart
+        this.incomeChartData.labels = incomeData.map((i: any) => i.date);
+        this.incomeChartData.datasets[0].data = incomeData.map((i: any) => i.amount);
+
+        console.log('Expense Chart Data:', this.expenseChartData);
+        console.log('Income Chart Data:', this.incomeChartData);
       },
       (error) => {
         console.error('Error fetching chart data:', error);
@@ -97,37 +134,36 @@ export class DashboardComponent implements OnInit {
     );
   }
 
-  
-  private loadStatsData(): void {
-    this.http.get<StatData>('http://localhost:8080/api/stats').subscribe(
+  // Load statistics data
+  private loadStatsData(){
+    this.http.get<StatData>(`http://localhost:8080/api/stats/${this.loginUserdata.id}`).subscribe(
       (statsData) => {
+        console.log('Received stats data:', statsData);
+        
         this.totalIncome = statsData.income;
         this.totalExpenses = statsData.expense;
         this.totalBalance = statsData.balance;
-
-        
+  
         this.highestIncome = {
-          amount: statsData.maxIncome,
-          date: statsData.latestIncome?.date,
+          amount: statsData.maxIncome || 0,
+          date: statsData.latestIncome?.date || '',
         };
         this.lowestIncome = {
-          amount: statsData.minIncome,
-          date: statsData.latestIncome?.date,
+          amount: statsData.minIncome || 0,
+          date: statsData.latestIncome?.date || '',
         };
-
+  
         this.highestExpense = {
-          amount: statsData.maxExpense,
-          date: statsData.latestExpense?.date,
+          amount: statsData.maxExpense || 0,
+          date: statsData.latestExpense?.date || '',
         };
         this.lowestExpense = {
-          amount: statsData.minExpense,
-          date: statsData.latestExpense?.date,
+          amount: statsData.minExpense || 0,
+          date: statsData.latestExpense?.date || '',
         };
-
-        console.log('Statistics Data:', statsData);
       },
       (error) => {
-        console.error('Error fetching statistics:', error);
+        console.error('Error loading statistics:', error);
       }
     );
   }

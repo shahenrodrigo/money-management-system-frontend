@@ -1,0 +1,20 @@
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="card p-4" style="width: 100%; max-width: 400px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+        <h3 class="text-center mb-4">Register</h3>
+        <div>
+            <div class="form-group mb-3">
+                <label for="name" style="font-weight: bold;">Full Name</label>
+                <input type="text" id="name" class="form-control" placeholder="Enter your full name" [(ngModel)]="user.name" required>
+            </div>
+            <div class="form-group mb-3">
+                <label for="email" style="font-weight: bold;">Email</label>
+                <input type="email" id="email" class="form-control" placeholder="Enter your email" [(ngModel)]="user.email" required>
+            </div>
+            <div class="form-group mb-3">
+                <label for="password" style="font-weight: bold;">Password</label>
+                <input type="password" id="password" class="form-control" placeholder="Create a password" [(ngModel)]="user.password" required>
+            </div>
+            <button type="submit" class="btn btn-success w-100" (click)="onSubmit()">Register</button>
+        </div>
+    </div>
+</div>
