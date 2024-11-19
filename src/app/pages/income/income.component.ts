@@ -13,9 +13,6 @@ import { AuthServiceService } from '../../auth-service.service';
 })
 export class IncomeComponent implements OnInit {
 
-
-  //public userid: any = 1;
-
   public incomeList: any = [];
 
   public income: any = {
@@ -25,7 +22,7 @@ export class IncomeComponent implements OnInit {
     description: "",
     amount: "",
     date: "",
-    userId:''
+    userId: ''
   };
 
   loginUserdata: any;
@@ -37,60 +34,72 @@ export class IncomeComponent implements OnInit {
   ngOnInit(): void {
     this.authService.user$.subscribe(userData => {
       this.loginUserdata = userData;
-      this.income.userId=this.loginUserdata.id;
+      this.income.userId = this.loginUserdata.id;
       this.loadData();
     });
   }
 
-
   public addIncome() {
     if (this.isEditing) {
       this.http.put(`http://localhost:8080/api/incomes/${this.income.id}`, this.income)
-        .subscribe(() => {
-          alert("Income updated successfully");
-          this.loadData();
-          this.resetForm();
-        }, (error) => {
-          console.error('Error updating income:', error);
+        .subscribe({
+          next: () => {
+            alert("Income updated successfully");
+            this.loadData(); // Reload the updated data
+            this.resetForm();
+          },
+          error: (error) => {
+            console.error('Error updating income:', error);
+          }
         });
     } else {
       this.http.post("http://localhost:8080/api/incomes", this.income)
-        .subscribe(() => {
-          alert("Income added successfully");
-          this.loadData();
-          this.resetForm();
-        }, (error) => {
-          console.error('Error adding income:', error);
+        .subscribe({
+          next: () => {
+            alert("Income added successfully");
+            this.loadData(); // Reload the data
+            this.resetForm(); // Reset form after adding
+          },
+          error: (error) => {
+            console.error('Error adding income:', error);
+          }
         });
     }
   }
 
   public loadData() {
-    this.http.get(`http://localhost:8080/api/incomes/get-all/${this.loginUserdata.id}`).subscribe((data) => {
-      this.incomeList = data;
-      console.log("Income list loaded:", data);
-    }, (error) => {
-      console.error('Error loading income list:', error);
+    this.http.get(`http://localhost:8080/api/incomes/get-all/${this.loginUserdata.id}`).subscribe({
+      next: (data) => {
+        this.incomeList = data; // Update the income list
+        console.log("Income list loaded:", data);
+      },
+      error: (error) => {
+        console.error('Error loading income list:', error);
+      }
     });
   }
-
 
   public editIncome(id: any) {
-    this.http.get(`http://localhost:8080/api/incomes/${id}`).subscribe((data: any) => {
-      this.income = { ...data }; // Populate the form with the selected income
-      this.isEditing = true; // Switch to Edit mode
-    }, (error) => {
-      console.error('Error fetching income record:', error);
+    this.http.get(`http://localhost:8080/api/incomes/${id}`).subscribe({
+      next: (data: any) => {
+        this.income = { ...data }; // Populate the form with the selected income
+        this.isEditing = true; // Switch to Edit mode
+      },
+      error: (error) => {
+        console.error('Error fetching income record:', error);
+      }
     });
   }
 
-
   public deleteIncome(id: any) {
-    this.http.delete(`http://localhost:8080/api/incomes/${id}`).subscribe(() => {
-      alert("Income deleted successfully");
-      this.loadData();
-    }, (error) => {
-      console.error('Error deleting income:', error);
+    this.http.delete(`http://localhost:8080/api/incomes/${id}`).subscribe({
+      next: () => {
+        alert("Income deleted successfully");
+        this.loadData(); // Reload the data after deletion
+      },
+      error: (error) => {
+        console.error('Error deleting income:', error);
+      }
     });
   }
 
@@ -102,7 +111,8 @@ export class IncomeComponent implements OnInit {
       category: "",
       description: "",
       amount: "",
-      date: ""
+      date: "",
+      userId: this.loginUserdata.id // Keep the userId for new income
     };
     this.isEditing = false;
   }

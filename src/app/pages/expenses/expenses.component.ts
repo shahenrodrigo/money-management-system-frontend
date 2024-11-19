@@ -120,6 +120,7 @@ export class ExpensesComponent implements OnInit {
       description: '',
       amount: '',
       date: '',
+      userId: this.loginUserdata.id
     };
     this.isEditing = false;
   }
